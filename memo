@@ -1,0 +1,23 @@
+12 X > 이거 켜져 있었어 
+CHIP~ x
+
+CHIP1~ O  -> 수집이 안 되는디 
+: 나연이 누나꺼 가져온거 같은데
+
+CHIP 복제 ~ X
+: localhost연결이 안 됨 
+> jupyter notebook 쳐라 
+> 비번 cwj9731 ( 방학때 예찬이형이 알려주신 비밀번호 )
+
+
+가중합 부분만 100만 포인트 
+
+하드코딩이랑 반복문 쓴거 파형에 차이 있는지 확인 
+
+트리거랑 원래 파형이랑 잘 조절해야지 파형이 잡힌다 > 트리거만 조절해서 안 됨
+
+
+
+samples : 24435 
+> 이거랑 상관 없나?
+ERROR:root:Received fewer points than expected! 24438 vs 1000000
