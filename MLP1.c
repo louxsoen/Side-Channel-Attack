@@ -12,18 +12,18 @@
 #define OUTPUT 2	// 출력층 노드 개수 
 
 // 입,출력 데이터 
-float X[INPUT] = { 1.0  };  // ※ Setting ※
-float Y[OUTPUT];	
+float X[INPUT] = { 1.0 };  // ※ Setting ※
+float Y[OUTPUT];
 
 // Weight ( ※ Setting ※ )
 float WX[INPUT][HIDDEN]; // 입력층 - 은닉층(1) 가중치(Weight)  // 왜 INPUT + 1인가?
 float WH[HIDDEN][OUTPUT]; // 은닉층(1) - 출력층 가중치(Weight)	
 
-// Weight Sum
+						  // Weight Sum
 float WSX[HIDDEN]; // 입력값으로 계산한 은닉층(1)에 들어갈 가중합
 float WSH[OUTPUT]; // 은닉층(1)의 출력값으로 계산한 출력층에 들어갈 가중합 
 
-// Activefunction Result
+				   // Activefunction Result
 float AFR[HIDDEN];
 
 
@@ -34,10 +34,15 @@ float AFR[HIDDEN];
 // Sigmoid 
 float sigmoid(float h)
 {
-	return (1 / (1 + expf((-1)*h)));
+	return (1 / (1 + exp((-1)*h)));
 }
 
 // tanhf : float 입출력 Tanh함수 
+float tanh2(float h)
+{
+	return (2 / (1 + exp(-2 * h)) - 1);
+
+}
 
 // ReLU 
 float relu(float h)
@@ -52,7 +57,7 @@ float softmax(float h, float *H, int n) // H : w*x 계산한 배열  |  n : H �
 
 	for (int i = 0; i < n; i++)
 	{
-		sum += expf(H[i]);
+		sum += exp(H[i]);
 	}
 
 	return (h / sum);
@@ -104,10 +109,12 @@ int main()
 		}
 	}
 
+
+
 	// 출력
 #if 1
 	printf("<< Weight Sum1(WSX) >> \n");
-	for (i = 0; i < INPUT; i++) 
+	for (i = 0; i < INPUT; i++)
 	{
 		printf("%d : %f \n", i + 1, WSX[i]);
 	}
@@ -118,7 +125,8 @@ int main()
 	// 가중합 입력에 대한 활성함수 결과값 
 	for (i = 0; i < HIDDEN; i++)
 	{
-		AFR[i] = tanhf(WSX[i]);
+		//AFR[i] = tanh2(WSX[i]);
+		AFR[i] = sigmoid(WSX[i]);
 	}
 
 	// 출력
@@ -130,7 +138,7 @@ int main()
 	}
 	printf("\n");
 #endif
-	
+
 	//*********************************************************//
 	// 				      은닉층 - 출력층             	       //
 	//*********************************************************//
@@ -145,7 +153,7 @@ int main()
 
 	// 출력
 #if 1
-	
+
 	printf("<< Weight Sum 2(WSH) >> \n");
 	for (i = 0; i < OUTPUT; i++)
 	{
@@ -158,7 +166,7 @@ int main()
 	// Softmax함수를 이용한 출력값  -> 함수로 어캐 바꾸지 
 	for (i = 0; i < OUTPUT; i++)
 	{
-		Y[i] = expf(WSH[i]); // 분자 
+		Y[i] = exp(WSH[i]); // 분자 
 		sum += Y[i];
 	}
 
