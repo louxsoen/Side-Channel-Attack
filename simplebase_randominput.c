@@ -138,7 +138,7 @@ uint8_t get_pt(uint8_t* pt) // char형값 16개 -> [0~4] 4개만 사용
 
 
 	// 가중합 + 활성함수 
-	for (i = 0; i < 1; i++) // HIDDEN
+	for (i = 0; i < HIDDEN; i++) 
 	{
 		for (j = 0; j < INPUT; j++)  
 		{
