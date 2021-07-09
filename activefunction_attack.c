@@ -1,4 +1,6 @@
 //*********************************************************//
+//     MLP 활성함수 연산시간 패턴 : Tanh vs. Sigmoid	   //
+//														   //
 // 	     MLP 활성함수 출력 CPA : Tanh vs. Sigmoid		   //
 //*********************************************************//
 
@@ -42,11 +44,13 @@
 // 정렬 알고리즘 시작 위치 
 #define startAL 14000
 
-// timedelay함수 
+// timedelay 함수 
 #define start 26 // 입력 CPA 기준 tanh : 26 / sigmoid : 34  ※ Setting ※
 #define peak 15000	// 더미 연산 피크 지점  
 
-
+// findpeak 함수 ( 기준 파형의 구분되는 지점의 시작과 끝 포인트 ) 
+#define st 
+#define end
 
 double Cov(double* x, double* y, int size) {
 	double Sxy = 0, Sx = 0, Sy = 0;
