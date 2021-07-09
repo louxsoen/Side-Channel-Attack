@@ -1,43 +1,54 @@
+//*********************************************************//
+// 	     MLP 활성함수 출력 CPA : Tanh vs. Sigmoid		   //
+//*********************************************************//
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> 
 #include <math.h>
 
-
 #define _FOLD_ "C:\\Users\\master\\Desktop\\LEEJUHEON\\"
-//#define TraceFN "ReLU_traces.npy"   
-//#define TraceFN "Tanh_traces.npy"
+// * textout에 입출력 포함 ( 활성함수 입력 : 1byte + 전체 네트워크 출력 : 1byte ) * //
+
+// Tanh
+#if 1
+#define TraceFN "Tanh_traces.npy"
+#define AlignedTraceFN "Aligned_Tanh3_traces.npy"
+#define PlaintextFN "Tanh_textout.npy"  
+#define CipherextFN "Tanh_textout.npy"
+#endif 
+
+// Sigmoid
+#if 0
 #define TraceFN "Sigmoid_traces.npy"
-
-
-//#define PlaintextFN "ReLU_textin.npy" 
-//#define PlaintextFN "Tanh_textin.npy"
-//#define PlaintextFN "Sigmoid_textin.npy"
-
-//#define PlaintextFN "Tanh_textout.npy"  // textout에 입출력 다 넣었어 
-//#define CipherextFN "Tanh_textout.npy"
-
+#define AlignedTraceFN "Aligned_Sigmoid_traces.npy"
 #define PlaintextFN "Sigmoid_textout.npy"
 #define CipherextFN "Sigmoid_textout.npy"
+#endif 
 
 
-//#define CipherextFN "ReLU_textout.npy"
-//#define CipherextFN "Tanh_textout.npy"
-//#define CipherextFN "Sigmoid_textout.npy"
+// ReLU ( CPA 필요 없음 눈으로 판단 가능)
+#if 0
+#define TraceFN "ReLU_traces.npy"   
+#define PlaintextFN "ReLU_textout.npy"
+#define CipherextFN "ReLU_textout.npy"
+#endif 
 
 
-#define startpoint 0
-#define endpoint 22000
+// 출력 지점 범위 지정 ( in Output CPA )
+#define startpoint 14000 	// ※ Setting ※ 13000
+#define endpoint 24000	// ※ Setting ※
 
-#define start 26 // 입력 CPA 기준 tanh : 26 / sigmoid : 34 
-//#define end 0  //필요 한가?
-#define peak 15000
+// 정렬 알고리즘 시작 위치 
+#define startAL 14000
 
-#define ClearTraceFN "Clear_ReLU_traces.npy" // Clear_Sigmod_traces.npy  / Clear_tanh_traces.npy -> 구할 필요없음 정확한 시점만 찾으면 됨 
-#define TrashTraceFN "trash_traces.npy"	// 칩위스퍼 쓰레기 파형 
+// timedelay함수 
+#define start 26 // 입력 CPA 기준 tanh : 26 / sigmoid : 34  ※ Setting ※
+#define peak 15000	// 더미 연산 피크 지점  
 
 
-double Cov(float* x, float* y, int size) {
+
+double Cov(double* x, double* y, int size) {
 	double Sxy = 0, Sx = 0, Sy = 0;
 	int i;
 	for (i = 0; i < size; i++) {
@@ -67,10 +78,10 @@ double Corr(float* x, float* y, int size)
 }
 
 
-void SubAligned(float* data1, float* data2, int windowsize, int stepsize, int  threshold, int TraceLength)  // data
+void SubAligned(double* data1, double* data2, int windowsize, int stepsize, int  threshold, int TraceLength)  // data
 {
 	int i, j, size, maxcovpos, k;
-	float* x, *y;
+	double* x, *y;
 	double cov, maxcov;
 
 
@@ -119,70 +130,71 @@ void SubAligned(float* data1, float* data2, int windowsize, int stepsize, int  t
 		}
 	}
 }
+ 
 
-
+// 입력 + 출력 지점 맞추기 위한 정렬 
 void Alignment()
 {
-	int windowsize = 500;
-	int stepsize = 450;
-	int threshold = 100;
+	int windowsize = 1000; // 500 1000
+	int stepsize = 950;	//450 950
+	int threshold =	700; // 100 200
 	char buf[256];
 	int err, TraceLength, TraceNum, i;
 	FILE* rfp, *wfp;
-	float* data1, *data2; // data1: 함수 파형 | data2: 쓰레기 파형 
+	double* data1, *data2;  // float -> double
+	char temp[128];
 
 
-
-	sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, TraceFN);	// 함수 파형 
+	sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, TraceFN);	
 	if ((err = fopen_s(&rfp, buf, "rb")))
 	{
 		printf("File Open Error1!!\n");
 	}
 
-	sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, TrashTraceFN); // 쓰레기 파형
+	sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, AlignedTraceFN); 
 	if ((err = fopen_s(&wfp, buf, "wb")))
 	{
 		printf("File Open Error2!!\n");
 	}
 
-	TraceLength = 0;
-	TraceNum = 0;
-	/*
-	fread(&TraceLength, sizeof(int), 1, rfp);
-	fwrite(&TraceLength, sizeof(int), 1, wfp);
-	fread(&TraceNum, sizeof(int), 1, rfp);
-	fwrite(&TraceNum, sizeof(int), 1, wfp);
-	*/
+	TraceLength = 24000;
+	TraceNum = 1000;
 
-	// fseek(rfp, 61, SEEK_SET);
-	// fseek(wfp, 61, SEEK_SET);
+	
+	// 헤더 작성 
+	fread(temp, sizeof(char), 128, rfp);
+	fwrite(temp, sizeof(char), 128, wfp);
+	fread(temp, sizeof(char), 128, rfp);
+	fwrite(temp, sizeof(char), 128, wfp);
 
-	fseek(rfp, 128, SEEK_SET);
-	fseek(wfp, 128, SEEK_SET);
+	//fseek(rfp, 128, SEEK_SET);
+	//fseek(wfp, 128, SEEK_SET);
 
-	data1 = (float*)calloc(TraceLength, sizeof(float));
-	data2 = (float*)calloc(TraceLength, sizeof(float));
+	data1 = (double*)calloc(TraceLength, sizeof(double));
+	data2 = (double*)calloc(TraceLength, sizeof(double));
+	
+	// CPA에 필요한 부분만 파형에 저장 -> 앞쪽을 0으로 맞춰야해서 귀찮아 
+	fread(data1, sizeof(double), TraceLength, rfp);
+	fwrite(data1, sizeof(double), TraceLength, wfp);
 
-	fread(data1, sizeof(float), TraceLength, rfp); 	fwrite(data1, sizeof(float), TraceLength, wfp);
+
 	for (i = 1; i < TraceNum; i++)
 	{
-		fread(data2, sizeof(float), TraceLength, rfp);
-		SubAligned(data1, data2, windowsize, stepsize, threshold, TraceLength);
-		fwrite(data2, sizeof(float), TraceLength, wfp);
+		fread(data2, sizeof(double), TraceLength, rfp);
+		SubAligned(data1 + startAL, data2 + startAL, windowsize, stepsize, threshold, TraceLength - startAL); // + startAL  // - startAL
+		fwrite(data2, sizeof(double), TraceLength, wfp);
 	}
+
 	fclose(rfp);
 	fclose(wfp);
-
 	free(data1);
 	free(data2);
 }
 
-
 void InputCPA()
 {
 	unsigned char** plaintext = NULL;
-	//float* plaintext = NULL; // float 입력 
-	double** data; // float -> double
+	double** data;
 	char buf[256];
 	int err, TraceLength, TraceNum, i, j, k;
 	FILE* rfp, *wfp;
@@ -201,8 +213,8 @@ void InputCPA()
 	}
 
 	// 파형수집 정보
-	TraceLength = 22000;
-	TraceNum = 5000;
+	TraceLength = 24000;	// ※ Setting ※
+	TraceNum = 1000;		// ※ Setting ※
 
 	data = (double**)calloc(TraceNum, sizeof(double*));
 
@@ -218,17 +230,21 @@ void InputCPA()
 	}
 	fclose(rfp);
 
-	/*
+
+	// 데이터 확인 
+#if 0
 	printf("%lf ", data[0][0]);
 	printf("%lf ", data[0][1]);
 	printf("%lf ", data[0][2]);
 	printf("%lf ", data[0][3]);
 	printf("%lf ", data[0][4]);
 	printf("%lf ", data[0][5]);
-	*/
+	printf("\n\n");
+#endif
 
 
-	// plaintext에 4byte만 담기
+	
+	// plaintext에 4byte 활성함수 입력 담기
 	sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, PlaintextFN);
 	if ((err = fopen_s(&rfp, buf, "rb")))
 	{
@@ -246,10 +262,10 @@ void InputCPA()
 	for (i = 0; i < TraceNum; i++)
 	{
 		fread(plaintext[i], sizeof(unsigned char), 4, rfp);
-		//fseek(rfp, 11, SEEK_SET);
 		fread(&temp, sizeof(unsigned char), 12, rfp);
 	}
 	fclose(rfp);
+
 
 #if 0
 	printf("%x ", plaintext[0][0]);
@@ -259,6 +275,7 @@ void InputCPA()
 	printf("%x ", plaintext[1][0]);
 	printf("%x ", plaintext[1][1]);
 	printf("%x ", plaintext[2][0]);
+	printf("\n\n");
 #endif
 
 	Sx = (double*)calloc(TraceLength, sizeof(double));
@@ -277,7 +294,6 @@ void InputCPA()
 	}
 
 
-
 	// float 입력에 대한 CPA
 	Sy = 0;
 	Syy = 0;
@@ -287,7 +303,6 @@ void InputCPA()
 
 	for (j = 0; j < TraceNum; j++)
 	{
-		//iv = plaintext[j][0]; // float형 변수 
 		iv = (plaintext[j][0] << 24 | plaintext[j][1] << 16 | plaintext[j][2] << 8 | plaintext[j][3]);
 
 		hw_iv = 0;
@@ -342,8 +357,7 @@ void InputCPA()
 void OutputCPA()
 {
 	unsigned char** ciphertext = NULL;
-	//float* plaintext = NULL; // float 입력 
-	double** data; // float -> double
+	double** data; 
 	char buf[256];
 	int err, TraceLength, TraceNum, i, j, k;
 	FILE* rfp, *wfp;
@@ -355,15 +369,16 @@ void OutputCPA()
 
 
 	// 활성함수 파형 담기 
-	sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, TraceFN);
+	sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, AlignedTraceFN); // AlignedTraceFN로 바꾸기 
+	//sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, TraceFN);
 	if ((err = fopen_s(&rfp, buf, "rb")))
 	{
 		printf("File Open Error1!!\n");
 	}
 
 	// 파형수집 정보
-	TraceLength = 22000;
-	TraceNum = 5000;
+	TraceLength = 24000;	// ※ Setting ※
+	TraceNum = 1000;		// ※ Setting ※
 
 	data = (double**)calloc(TraceNum, sizeof(double*));
 
@@ -379,17 +394,20 @@ void OutputCPA()
 	}
 	fclose(rfp);
 
-	/*
+
+	// 파형 확인 
+#if 0
 	printf("%lf ", data[0][0]);
 	printf("%lf ", data[0][1]);
 	printf("%lf ", data[0][2]);
 	printf("%lf ", data[0][3]);
 	printf("%lf ", data[0][4]);
 	printf("%lf ", data[0][5]);
-	*/
+	printf("\n\n");
+#endif
 
 
-	// plaintext에 4byte만 담기
+	// cipherext에 2개의 활성함수 출력값 담기 ( tanh + sigmoid )
 	sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, CipherextFN);
 	if ((err = fopen_s(&rfp, buf, "rb")))
 	{
@@ -400,26 +418,28 @@ void OutputCPA()
 
 	for (i = 0; i < TraceNum; i++)
 	{
-		ciphertext[i] = (unsigned char*)calloc(4, sizeof(unsigned char));
+		ciphertext[i] = (unsigned char*)calloc(8, sizeof(unsigned char));
 	}
 
 	fseek(rfp, 128, SEEK_SET);
 	for (i = 0; i < TraceNum; i++)
 	{
 		fread(&temp, sizeof(unsigned char), 4, rfp);
-		fread(ciphertext[i], sizeof(unsigned char), 4, rfp);
-		fread(&temp, sizeof(unsigned char), 8, rfp);
+		fread(ciphertext[i], sizeof(unsigned char), 8, rfp);
+		fread(&temp, sizeof(unsigned char), 4, rfp);
 	}
 	fclose(rfp);
 
+	// 출력값 확인 
 #if 0
-	printf("%x ", plaintext[0][0]);
-	printf("%x ", plaintext[0][1]);
-	printf("%x ", plaintext[0][2]);
-	printf("%x ", plaintext[0][3]);
-	printf("%x ", plaintext[1][0]);
-	printf("%x ", plaintext[1][1]);
-	printf("%x ", plaintext[2][0]);
+	printf("%x ", ciphertext[0][0]);
+	printf("%x ", ciphertext[0][1]);
+	printf("%x ", ciphertext[0][2]);
+	printf("%x ", ciphertext[0][3]);
+	printf("%x ", ciphertext[1][0]);
+	printf("%x ", ciphertext[1][1]);
+	printf("%x ", ciphertext[1][2]);
+	printf("%x ", ciphertext[1][3]);
 #endif
 
 	Sx = (double*)calloc(TraceLength, sizeof(double));
@@ -437,15 +457,14 @@ void OutputCPA()
 		}
 	}
 
-
-
-	// float 입력에 대한 CPA
+	//Tanh 출력값을 이용하여 CPA
+#if 1
 	Sy = 0;
 	Syy = 0;
 	max = 0;
 	memset(Sxy, 0, sizeof(double) * TraceLength);
 
-
+	// Tanh 예측 출력 CPA
 	for (j = 0; j < TraceNum; j++)
 	{
 		//iv = plaintext[j][0]; // float형 변수 
@@ -457,7 +476,6 @@ void OutputCPA()
 		for (k = 0; k < 32; k++) // 32bit
 		{
 			hw_iv += ((iv >> k) & 1);
-			//printf("%d \n", hw_iv);
 		}
 
 		Sy += hw_iv;
@@ -480,7 +498,7 @@ void OutputCPA()
 		}
 	}
 
-	sprintf_s(buf, 256 * sizeof(char), "%scorrtrace\\output.corrtrace", _FOLD_);
+	sprintf_s(buf, 256 * sizeof(char), "%scorrtrace\\tanh_output.corrtrace", _FOLD_);
 	if ((err = fopen_s(&wfp, buf, "wb")))
 	{
 		printf("File Open Error3!!\n");
@@ -490,8 +508,65 @@ void OutputCPA()
 	//printf(".");
 
 
-	printf("output maxcorr : %lf at %dpoint \n", max, maxpoint + 1); // Matlab 1부터 시작하는거 반영 
+	printf("Guessing Tanh output maxcorr : %lf at %dpoint \n\n", max, maxpoint + 1); // Matlab 1부터 시작하는거 반영 
+#endif 
 
+
+	//Sigmoid 출력값을 이용하여  CPA
+#if 1 
+	Sy = 0;
+	Syy = 0;
+	max = 0;
+	memset(Sxy, 0, sizeof(double) * TraceLength);
+
+	// Sigmoid 예측 출력 CPA
+	for (j = 0; j < TraceNum; j++)
+	{
+		//iv = plaintext[j][0]; // float형 변수 
+		iv = (ciphertext[j][4] << 24 | ciphertext[j][5] << 16 | ciphertext[j][6] << 8 | ciphertext[j][7]);
+
+		hw_iv = 0;
+
+
+		for (k = 0; k < 32; k++) // 32bit
+		{
+			hw_iv += ((iv >> k) & 1);
+		}
+
+		Sy += hw_iv;
+		Syy += hw_iv * hw_iv;
+
+		for (k = startpoint; k < endpoint; k++)
+		{
+			Sxy[k] += hw_iv * data[j][k];
+		}
+	}
+
+	for (k = startpoint; k < endpoint; k++)
+	{
+		corrT[k] = ((double)TraceNum * Sxy[k] - Sx[k] * Sy) / sqrt(((double)TraceNum * Sxx[k] - Sx[k] * Sx[k]) * ((double)TraceNum * Syy - Sy * Sy));
+
+		if (fabs(corrT[k]) > max)
+		{
+			maxpoint = k;
+			max = fabs(corrT[k]);
+		}
+	}
+
+	sprintf_s(buf, 256 * sizeof(char), "%scorrtrace\\sigmoid_output.corrtrace", _FOLD_);
+	if ((err = fopen_s(&wfp, buf, "wb")))
+	{
+		printf("File Open Error3!!\n");
+	}
+	fwrite(corrT, sizeof(double), TraceLength, wfp);
+	fclose(wfp);
+	//printf(".");
+
+
+	printf("Guessing Sigmoid output maxcorr : %lf at %dpoint \n\n", max, maxpoint + 1); // Matlab 1부터 시작하는거 반영 
+#endif 
+
+	
 	free(Sx);
 	free(Sxx);
 	free(Sxy);
@@ -599,9 +674,72 @@ void timedelay()
 }
 
 
+void subfindpeak(double *data1, double* data2, int size, int TraceLength) // size가 밀면서 상관계수를 구하는 범위 
+{
+
+
+}
+
+
+void findpeak()
+{
+	int windowsize = 500;
+	int stepsize = 450;
+	int threshold = 100;
+	char buf[256];
+	int err, TraceLength, TraceNum, i;
+	FILE* rfp, *wfp;
+	double* data1, *data2;
+
+
+	
+	sprintf_s(buf, 256 * sizeof(char), "%s%s", _FOLD_, TraceFN);	
+	if ((err = fopen_s(&rfp, buf, "rb"))) 
+	{
+		printf("File Open Error1!!\n");
+	}
+
+	TraceLength = 24000;
+	TraceNum = 1000;
+
+	data1 = (double*)calloc(TraceLength, sizeof(double)); 	// 첫번째 파형 로딩
+	data2 = (double*)calloc(TraceLength, sizeof(double));		// 두번째 이후 파형 로딩
+
+	fseek(rfp, SEEK_SET, 128);
+	fread(data1, sizeof(double), TraceLength, rfp);
+
+
+	// 밀면서 상관계수 계산하기 > 앞으로 조금 당긴다음에 시작 
+	for (i = 1; i < TraceNum; i++)
+	{
+		fread(data2, sizeof(double), TraceLength, rfp);
+		subfindpeak(data1, data2,TraceLength);  		
+		fwrite(data2, sizeof(double), TraceLength, wfp);
+	}
+	fclose(rfp);
+
+
+	free(data1); 	
+	free(data2);
+	
+
+
+	
+
+
+	
+
+
+}
+
+
+
 int main()
 {
+	//Alignment();
 	//InputCPA();
 	//OutputCPA();
-	timedelay();
+	//timedelay();
+	findpeak();
+
 }
