@@ -72,3 +72,24 @@ corrcoef 하면 파형 전체 부분에 대한 상관계수 구할 수 있게됨
 
 - 오실로스코프 
 수집시간이랑 연산 넘거주는 시간이 차이나서 넘겨주는 시간 끝나면 수집 멈춤 
+
+
+####################################
+/usr/lib/gcc/arm-none-eabi/5.4.1/../../../arm-none-eabi/bin/ld: simpleserial-base-CW308_STM32F3.elf section `.bss' will not fit in region `RAM'
+/usr/lib/gcc/arm-none-eabi/5.4.1/../../../arm-none-eabi/bin/ld: region `RAM' overflowed by 1384 bytes
+> float값 3000개는 너무 많나?  절만만 해볼까 
+
+excess elements in array initializer
+> 배열 크기 부족 
+
+74 ~ 406 줄  -> +1 = 1줄 = 입력 3개  -> +200 -> 입력 600개 
+
+406 - 74 + 1 = 333  
+
+파형은 나눠서 구하면 되니까 
+
+
+다시 연결하려고 하니까 추가할 수 없다고 나옴 그리고 칩위스퍼 꺼짐 
+
+
+
