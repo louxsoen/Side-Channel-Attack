@@ -1,32 +1,42 @@
-function corr = timedelay(standard , trace, trNum)
+function time = timedelay(inputcorr , movecorr,trNum,FN)
 
-startindex = 1; % 1 | 27
-startpoint = 1; % [ 1 ~ ( length(trace(:,i)) - length(standard) )]  1271000
+% 2개의 상관계수 파형을 이용하여 연산시간 측정 
 
-% 기준파형을 밀면서 상관계수 구하기
-for i = startindex : ( startindex + trNum )
-    
-    range = (length(trace(:,i)) - length(standard)); % [ 1 ~ ( length(trace(:,i)) - length(standard) ) ]
-    
-    for j = startpoint : ( startpoint + range - 1 )
-        
-        % correalation coefficient
-        temp = corrcoef(standard , trace(j:length(standard) + j - 1 ,i));
-        corr(j,i) = temp(1,2);
-        
-        % cross correlation
-%         temp = xcorr(standard , trace(j:length(standard)+j - 1 ,i));
-%         corr(j,i) = temp(1,1);
-    end
-    
+for i = 1 : trNum
+  [maxcorr,front] = max(abs(inputcorr(:,1)));
+  [maxcorr,back] = max(movecorr(:,i));
+  
+   Y(i) = (back - front);
+   %fprintf("%d ",Y(i));
 end
 
-plot(corr(:,startindex));
 
-% 상관계수 파형을 이용하여 연산시간 측정 
+% 활성함수 입력값 로딩
 
+inputFile = fopen(FN,'r');
+fseek(inputFile,128,'bof');
 
+%fprintf("\n");
 
-
-
+for i=1 : trNum
+    temp = fread(inputFile, 3, 'float');
+    X(i) = fread(inputFile, 1, 'float');
+    %fprintf("%d ",X(i));
 end
+
+%fprintf("\n");
+
+% X,Y값 1개의 배열로 합치기 
+time = [X; Y];
+
+
+% 그래프 그리기 
+scatter(X,Y+7133,'filled');
+xlabel('input');
+ylabel('timedelay');
+title('sigmoid 함수');
+grid on
+
+
+
+end 
