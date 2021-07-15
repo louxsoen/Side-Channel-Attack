@@ -68,7 +68,40 @@ WARNING:root:Timeout in OpenADC capture(), trigger FORCED
 과부하 안걸리는 선에서 나눠서하는게 제일 편한거 같아 
 > 자꼬 멈춰... 
 
+- 칩위스퍼 관련 자료 
 
+[ 하드웨어 ] chipwhisperer ufo board
+https://www.researchgate.net/figure/Image-of-the-ChipWhisperer-UFO-board-with-the-ChipWhisperer-STM32F3-target-board_fig5_343888677
+
+https://www.mouser.com/datasheet/2/894/NAE-CW308-datasheet-1289269.pdf
+
+https://rtfm.newae.com/Targets/CW308%20UFO.html
+
+
+- 오실로스코프 관련 자료 
+https://www.jensentools.com/teledyne-lecroy-hdo4054-high-definition-hd4096-oscilloscope-500-mhz-4-channel/p/478-136
+: 오실로스코프 모델 
+
+https://www.manualslib.com/
+: 설명서 
+
+https://www.manualslib.com/manual/1296878/Teledyne-Lecroy-Hdo6000.html?page=150#manual
+: 오실로스코프 설명서 모음집 
+
+https://www.manualslib.com/manual/1296878/Teledyne-Lecroy-Hdo6000.html?page=150
+: Auto Save 
+
+왜 Auto Save꺼지는거야? 저장공간이 부족한거야? 
+> 화면이 꺼져서 그런가 
+> 화면 꺼지지 않게 하면 되는거 같아 
+
+
+파형 중복되지 않고 옳게 구한건지 어떻게 알지? 
+
+makefile만들기 
+
+
+더 저장하는건 멀 저장하는거야?
 ,,,,,,,,,,,,,,,
 
 - VM 메모리는 늘리기
