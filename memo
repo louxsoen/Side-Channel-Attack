@@ -1,0 +1,56 @@
+가중치값 랜덤으로 해서 활성함수 입력도 랜덤화됨 
+> 활성함수 입력 일정하도록 다시 입력 지정 
+> 첫번째 층의 모든 활성함수 입력을 고르게 할 수는 없어 
+> 첫번째 층의 첫번째 노드의 활성함수 입력만 고르게 하자 
+
+입력이 고르지 않고 랜덤할 때 vs. 고를 때 해보자 
+> 걍 두번째 노드에 대해서 하면 고르지 않은거 아니야? 
+
+
+600개 > 1줄에 3개 > 200줄 
+
+480개 > 160줄 
+
+
+< 오실로스코프 > 
+
+https://news.samsungdisplay.com/21832/
+: 단위 
+
+https://blog.naver.com/lecroykorea
+: 오실로스코프 블로그 ( 공부집 )
+
+https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=seo0511&logNo=10131116103
+: 조절기 의미 ( 공부집 )
+> 조절기에 push도 있음 
+
+https://www.quora.com/What-is-the-time-delay-in-an-oscilloscope
+> delay의미 
+> 내가 생각하는 delay랑 다른거 같음 
+
+- 오실로스코프 수집 세팅 
+sampling rate : 초당 수집 점의 개수 > 10.0GS/s  
+Time/Division : 칸당 시간 > 500us
+> s - ns 조절기 담당 
+Delay : 2.00ms
+> Horizontal 조절기 조절하면 생김 
+
+- 파형 처리 
+C1 : 스케일 100mV  / offset : -3.089V
+C2 : 스케일 : 1.0V / offset : -360mV
+노이즈필터 : 
+
+- 수집 세팅 저장 방법 
+
+
+왜 중간에 차이가 나는거야 
+> 더 느리게 해야하나 
+> 600개를 다 수집을 못 하네 
+> C1 : 95MB C2 : 95MB
+> 500개 정도 가능 
+
+
+
+
+
+
