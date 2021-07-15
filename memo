@@ -69,4 +69,15 @@ WARNING:root:Timeout in OpenADC capture(), trigger FORCED
 > 자꼬 멈춰... 
 
 
+,,,,,,,,,,,,,,,
 
+- VM 메모리는 늘리기
+[1] VM 메모리 늘리기
+https://m.blog.naver.com/amgn2020/222088088204
+> V BoxManage modifyhd --resize 30720 "C:\Users\master\VirtualBox VMs\초보자용\ChipWhisperer Jupyter 1-disk001.vdi"
+> 일반 - 고급에 해당 VM 저장위치 확인가능
+
+[2] 리눅스 설정 
+https://antimidal.tistory.com/4
+> 저장 파티션 새로 설정해줘야함
+> 기존파일 삭제 될 거 같은디 
