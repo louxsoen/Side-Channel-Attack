@@ -1,5 +1,5 @@
   
-function corr = movingCPA(standard , trace, trNum)
+function corr = movingcorr(standard , trace, trNum)
 
 startindex = 1; % 1 | 27
 startpoint = 1; % [ 1 ~ ( length(trace(:,i)) - length(standard) )]  1271000
@@ -22,6 +22,7 @@ for i = startindex : ( startindex + trNum - 1 )
     
 end
 
+figure;
 plot(corr(:,startindex));
 
 
