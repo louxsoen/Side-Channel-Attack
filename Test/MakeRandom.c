@@ -37,3 +37,25 @@ int main()
 
 	return 0;
 }
+
+// -10 ~ 10 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+int main()
+{
+	int i;
+
+	srand((unsigned)time(NULL));
+
+
+	for (i = 0; i < 1000; i++)
+	{
+		printf("%.3f ,",  (float)(rand() % 20000 - 10000) / 1000);  // 가중치 범위 : -10 ~ 10 
+		if (i % 10 == 0 && i != 0)
+			printf("\n");
+	}
+	
+}
