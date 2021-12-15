@@ -1,0 +1,19 @@
+function trace = make_dtw(size,filename_format)
+filename = sprintf(filename_format,0);
+standard = ReadLeCroyBinaryWaveform(filename);
+idx = 188000:220000;
+standard = standard.y(idx);
+for i=0:size-1
+    i
+    filename = sprintf(filename_format,i);
+    tmp = ReadLeCroyBinaryWaveform(filename);
+    tmp = tmp.y(idx);
+    [dist , ix , iy] = dtw(standard , tmp);
+    if i == 0
+        trace  = iy;
+    end
+    trace = horzcat(trace ,iy);
+    
+
+end
+end
