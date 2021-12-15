@@ -1,0 +1,25 @@
+function z = file_alignment(size,read_filename_format)
+%filename_format C2--0--%5d.trc
+%filename_format C4--0--%5d.trc
+
+read_filename = sprintf(read_filename_format,0);
+compare = ReadLeCroyBinaryWaveform(read_filename);
+compare = compare.y(100000:200000);
+compare = normalize(compare);
+
+for i=0:size-1
+    i
+    read_filename = sprintf(read_filename_format,i);
+    st = ReadLeCroyBinaryWaveform(read_filename);
+    tmp = st.y(100000:200000);
+    tmp = normalize(tmp);
+    result = horzcat(compare , tmp);
+    result = alignment(result,2);
+    tmp = result(:,2);
+    write_filename = sprintf('D:\\epicme_sudo\\0_trace_al\\C2_trace0_%05d.txt',i);
+    writematrix(tmp,write_filename);
+end
+
+z = 1;
+
+end
