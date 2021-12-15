@@ -1,0 +1,43 @@
+function [sum_x,sum_xx,sum_y,sum_yy,sum_xy]= make_cpa_mat(size,filename_format,plaintext)
+%filename_format C2--0--%05d.trc
+%filename_format C4--0--%05d.trc
+%Load Plaintext on WorkSpace
+
+%%%%% Load Plaintext %%%%%
+
+plaintext_hw = sum( dec2bin(plaintext(1:size)).' == '1' );
+sum_y = sum(plaintext_hw);
+sum_yy = sum(plaintext_hw.*plaintext_hw);
+length(plaintext_hw)
+
+%%%%% Make CPA material %%%%%
+index = 108000:150000;
+filename = sprintf(filename_format,0);
+compare = ReadLeCroyBinaryWaveform(filename);
+compare = compare.y(index);
+compare = compare - mean(compare);
+for i=0:size-1
+    i
+    filename = sprintf(filename_format,i);
+    st = ReadLeCroyBinaryWaveform(filename);
+    tmp = st.y(index);
+    tmp = tmp - mean(tmp);
+    result = horzcat(compare , tmp);
+    result = alignment(result,2);
+    tmp = result(:,2);
+    
+    %Initialization
+    %% 
+    if i==0
+        sum_x=tmp;
+        sum_xx=tmp.*tmp;
+        sum_xy=tmp*plaintext_hw(i+1);
+    end
+
+    sum_x = sum_x + tmp;
+    sum_xx = sum_xx + tmp.*tmp;
+    sum_xy = sum_xy + tmp*plaintext_hw(i+1);
+    
+end
+
+end
