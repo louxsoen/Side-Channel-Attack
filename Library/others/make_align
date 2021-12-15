@@ -1,0 +1,16 @@
+function result = make_align(size,filename_format, standard)
+index = 460000:520000;
+compare = ReadLeCroyBinaryWaveform(standard);
+compare = compare.y(index);
+for i=0:size-1
+    i
+    filename = sprintf(filename_format,i);
+    temp = ReadLeCroyBinaryWaveform(filename);
+    temp = temp.y(index);
+    tempresult = horzcat(compare, temp);
+    tempresult = alignment(tempresult , 2);
+    result = tempresult(:,2);
+    savefilename = sprintf("../align2/align%05d.mat" ,i+30000);
+    %% 
+    save(savefilename,'result');  
+end
