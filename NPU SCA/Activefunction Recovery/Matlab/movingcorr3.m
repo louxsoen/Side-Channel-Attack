@@ -1,12 +1,16 @@
 % [ Moving corr ] : 파일 읽어서 밀면서 상관계수 구하기 + 최적화 
-function z = movingcorr3(FN,trNum)
-
+function z = movingcorr3(trace, standard)
+trNum = 1000;
+len = 20000;
 % 파일 읽기 
-fid = fopen(FN,'r');
+%fid = fopen(trace,'r');
+
+startindex = 1;
+startpoint = 1;
 
 for k = 1 : trNum
-    len = fread(fid,1,'uint32');
-    z = fread(fid,len,'double');
+    %len = fread(fid,1,'uint32');
+    %z = fread(fid,len,'double');
 
 % 기준파형을 밀면서 상관계수 구하기
 for i = startindex : ( startindex + trNum - 1 )
